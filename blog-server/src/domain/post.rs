@@ -1,23 +1,24 @@
-use serde::{ Serialize, Deserialize };
+use serde::{Serialize, Deserialize};
+use chrono::{DateTime, Utc};
 
 #[derive(Serialize, Deserialize)]
 pub struct Post{
-    id: i64,
-    title: String,
-    content: String,
-    author_id: i64,
-    created_at: chrono::NaiveDateTime,
-    updated_at: chrono::NaiveDateTime,
+    pub id: i64,
+    pub title: String,
+    pub content: String,
+    pub author_id: i64,
+    pub created_at: Option<DateTime<Utc>>,
+    pub updated_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct PostCreate{
-    title: String,
-    content: String,
+    pub title: String,
+    pub content: String,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct PostUpdate{
-    title: String,
-    content: String,
+    pub title: String,
+    pub content: String,
 }

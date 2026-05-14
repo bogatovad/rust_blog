@@ -14,7 +14,9 @@ use dotenvy::dotenv;
 
 use crate::presentation::http_handlers::configure;
 use crate::data::user_repository::UserRepository;
-
+use crate::data::post_repository::PostRepository;
+use crate::application::auth_service::AuthService;
+use crate::application::blog_service::PostService;
 
 #[derive(Envconfig)]
 struct Config {
@@ -43,8 +45,14 @@ async fn main() -> std::io::Result<()> {
 
     let pool = get_pool(config.database_url).await;
     let _ = run_migrations(&pool).await;
-    let repo = UserRepository::new(Arc::new(pool));
+    let pool_arc = Arc::new(pool);
 
+
+    let repo_user = UserRepository::new(pool_arc.clone());
+    let repo_post = PostRepository::new(pool_arc.clone());
+
+    let auth_service = AuthService::new(repo_user);
+    let post_service = PostService::new(repo_post);
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -60,9 +68,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(cors)
-            .app_data(web::Data::new(repo.clone()))
-            //.app_data(web::Data::new(pool.clone()))
-            //.app_data(web::Data::new(cfg.clone()))
+            .app_data(web::Data::new(auth_service.clone()))
+            .app_data(web::Data::new(post_service.clone()))
             .configure(configure)
     })
         .bind(config.addr)?

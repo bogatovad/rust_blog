@@ -1,5 +1,5 @@
 -- Создание таблицы posts
-CREATE TABLE posts (
+CREATE TABLE posts IF NOT EXISTS (
                        id BIGSERIAL PRIMARY KEY,
                        title VARCHAR(255) NOT NULL,
                        content TEXT NOT NULL,
